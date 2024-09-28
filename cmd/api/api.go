@@ -17,6 +17,7 @@ type config struct {
 	addr string
 }
 
+// this is where all the middlewares and the routes will be handled
 func (app *application) mount() http.Handler {
 	r := chi.NewRouter()
 
@@ -34,6 +35,7 @@ func (app *application) mount() http.Handler {
 	return r
 }
 
+// the run function takes a mux which is responsible for routing and deploys the code
 func (app *application) run(mux http.Handler) error {
 
 	srv := &http.Server{

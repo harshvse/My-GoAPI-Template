@@ -5,6 +5,7 @@ import (
 	"strconv"
 )
 
+// read the enviornment variable and return the string other types are given below
 func GetString(key, fallback string) string {
 	val, ok := os.LookupEnv(key)
 	if !ok {
