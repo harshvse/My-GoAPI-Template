@@ -29,7 +29,7 @@ func main() {
 
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
 	if err != nil {
-		log.Panic(err)
+		log.Panic("Database connection failed ",err)
 	}
 	defer db.Close()
 	log.Println("Database connected")

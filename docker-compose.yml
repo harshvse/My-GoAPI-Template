@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   db:
@@ -6,14 +6,14 @@ services:
     container_name: postgres-db
     environment:
       POSTGRES_DB: golangdb
-      POSTGRES_USER: user 
+      POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-    
+
     volumes:
       - db-data:/var/lib/postgresql/data
-    
+
     ports:
-      - "5432:5432"
+      - "5431:5432"
 
 volumes:
   db-data:
