@@ -8,12 +8,12 @@ Same for the migrate I am using https://github.com/golang-migrate/migrate this n
 
 As for the folder structure
 
-├───cmd // This folder contains the main code for the webserver
-│   ├───api // Contains all the routes and the logic for the APIs
-│   └───migrate // Contains the migrations and the migration history for the database
-│       └───migrations
-├───internal  // This is where I am storing all the utility functions
-│   ├───db
-│   ├───env
-│   └───store
+├───cmd // This folder contains the main code for the webserver  
+│ ├───api // Contains all the routes and the logic for the APIs  
+│ └───migrate // Contains the migrations and the migration history for the database  
+│ └───migrations  
+├───internal // This is where I am storing all the utility functions  
+│ ├───db  
+│ ├───env  
+│ └───store  
 └───scripts // I am gonna save all my scripts that needs to be executed for the setup of the server
