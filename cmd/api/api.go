@@ -16,8 +16,10 @@ type application struct {
 }
 
 type config struct {
-	addr string
-	db   dbConfig
+	addr    string
+	db      dbConfig
+	env     string
+	version string
 }
 
 type dbConfig struct {
@@ -40,6 +42,13 @@ func (app *application) mount() http.Handler {
 
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
+
+		r.Route("/posts", func(r chi.Router) {
+			r.Post("/create", app.createNewPost)
+			r.Route("/{postId}", func(r chi.Router) {
+				r.Get("/", app.getAllPosts)
+			})
+		})
 	})
 
 	return r

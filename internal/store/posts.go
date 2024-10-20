@@ -22,7 +22,7 @@ type PostStore struct {
 }
 
 func (s *PostStore) Create(ctx context.Context, post *Post) error {
-	query := `INSERT INTO post (content,title,user_id,tags)
+	query := `INSERT INTO posts (content,title,user_id,tags)
 	VALUES ($1,$2,$3,$4) RETURNING id,created_at,updated_at
 	`
 	err := s.db.QueryRowContext(
@@ -36,6 +36,20 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 		&post.ID,
 		&post.CreatedAt,
 		&post.UpdatedAt,
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (s *PostStore) Get(ctx context.Context, userId int64) error {
+	query := `SELECT * FROM posts WHERE user_id $1`
+	var post Post
+	err := s.db.QueryRowContext(ctx, query, userId).Scan(
+		&post.ID,
+		&post.Title,
+		&post.Content,
+		&post.Tags,
 	)
 	if err != nil {
 		return err

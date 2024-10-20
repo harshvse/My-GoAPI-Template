@@ -25,11 +25,13 @@ func main() {
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
+		env:     env.GetString("ENVIRONMENT", "Development"),
+		version: env.GetString("APIVERSION", "v1"),
 	}
 
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
 	if err != nil {
-		log.Panic("Database connection failed ",err)
+		log.Panic("Database connection failed ", err)
 	}
 	defer db.Close()
 	log.Println("Database connected")
