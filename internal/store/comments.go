@@ -3,8 +3,6 @@ package store
 import (
 	"context"
 	"database/sql"
-
-	"github.com/lib/pq"
 )
 
 type Comment struct {
@@ -34,33 +32,25 @@ func (s *CommentsStore) Create(ctx context.Context, comment *Comment) error {
 }
 
 type PostWithComments struct {
-	UserID           int64    `json:"user_id"`
-	PostID           int64    `json:"post_id"`
-	PostTitle        string   `json:"post_title"`
-	PostContent      string   `json:"post_content"`
-	PostTags         []string `json:"tags"`
-	PostCreatedAt    string   `json:"post_created_at"`
-	PostUpdatedAt    string   `json:"post_updated_at"`
-	CommentID        int64    `json:"comment_id"`
-	CommentContent   string   `json:"comment_content"`
-	CommentCreatedAt string   `json:"comment_created_at"`
+	UserID           int64  `json:"user_id"`
+	PostID           int64  `json:"post_id"`
+	Username         string `json:"username"`
+	CommentID        int64  `json:"comment_id"`
+	CommentContent   string `json:"comment_content"`
+	CommentCreatedAt string `json:"comment_created_at"`
 }
 
 func (s *CommentsStore) GetPostByID(ctx context.Context, postId int64) ([]PostWithComments, error) {
 	query := `SELECT
 		c.user_id as user_id,
 		c.post_id as post_id,
-		p.title as post_title,
-		p.content as post_content,
-		p.tags as tags,
-		p.created_at as post_created_at,
-		p.updated_at as post_updated_at,
+		u.username as username,
 		c.id as comment_id,
 		c.content as comment_content,
 		c.created_at as content_created_at
 	FROM comments AS c 
-	INNER JOIN posts as p 
-	ON p.id=c.post_id 
+	INNER JOIN users as u 
+	ON u.id=c.user_id 
 	WHERE c.post_id=($1)`
 	rows, err := s.db.QueryContext(ctx, query, postId)
 
@@ -72,11 +62,7 @@ func (s *CommentsStore) GetPostByID(ctx context.Context, postId int64) ([]PostWi
 		var singlePostWithComments PostWithComments
 		err := rows.Scan(&singlePostWithComments.UserID,
 			&singlePostWithComments.PostID,
-			&singlePostWithComments.PostTitle,
-			&singlePostWithComments.PostContent,
-			pq.Array(&singlePostWithComments.PostTags),
-			&singlePostWithComments.PostCreatedAt,
-			&singlePostWithComments.PostUpdatedAt,
+			&singlePostWithComments.Username,
 			&singlePostWithComments.CommentID,
 			&singlePostWithComments.CommentContent,
 			&singlePostWithComments.CommentCreatedAt,
