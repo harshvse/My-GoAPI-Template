@@ -46,8 +46,7 @@ type PostWithComments struct {
 	CommentCreatedAt string   `json:"comment_created_at"`
 }
 
-func (s *CommentsStore) GetPostByID(ctx context.Context, postId int64) (*[]PostWithComments, error) {
-	var postWithComments PostWithComments
+func (s *CommentsStore) GetPostByID(ctx context.Context, postId int64) ([]PostWithComments, error) {
 	query := `SELECT
 		c.user_id as user_id,
 		c.post_id as post_id,
@@ -68,5 +67,24 @@ func (s *CommentsStore) GetPostByID(ctx context.Context, postId int64) (*[]PostW
 	if err != nil {
 		return nil, err
 	}
-	return &postWithComments, nil
+	var postWithComments []PostWithComments
+	for rows.Next() {
+		var singlePostWithComments PostWithComments
+		err := rows.Scan(&singlePostWithComments.UserID,
+			&singlePostWithComments.PostID,
+			&singlePostWithComments.PostTitle,
+			&singlePostWithComments.PostContent,
+			pq.Array(&singlePostWithComments.PostTags),
+			&singlePostWithComments.PostCreatedAt,
+			&singlePostWithComments.PostUpdatedAt,
+			&singlePostWithComments.CommentID,
+			&singlePostWithComments.CommentContent,
+			&singlePostWithComments.CommentCreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		postWithComments = append(postWithComments, singlePostWithComments)
+	}
+	return postWithComments, nil
 }
