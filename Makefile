@@ -1,6 +1,22 @@
 include .env
 MIGRATIONS_PATH = ./cmd/migrate/migrations
 
+.PHONY: dev up down
+run: up
+
+up:
+	docker compose up -d db
+	@echo "Waiting for PostgreSQL to be ready..."
+	@until docker compose exec db pg_isready -h localhost -p 5432 -U user; do \
+		echo "PostgreSQL is unavailable - sleeping"; \
+		sleep 1; \
+	done
+	@echo "PostgreSQL is ready!"
+	air
+
+down:
+	docker compose down
+
 .PHONY: migrate-create
 migration:
 	@migrate create -seq -ext sql -dir $(MIGRATIONS_PATH) $(filter-out $@,$(MAKECMDGOALS))
