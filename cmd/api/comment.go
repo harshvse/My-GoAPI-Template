@@ -32,7 +32,7 @@ func (app *application) createCommentHandler(w http.ResponseWriter, r *http.Requ
 		app.internalServerError(w, r, err)
 		return
 	}
-	if err := writeJson(w, http.StatusOK, comment); err != nil {
+	if err := app.jsonResponse(w, http.StatusOK, comment); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
@@ -54,7 +54,7 @@ func (app *application) getCommentByPostIDHandler(w http.ResponseWriter, r *http
 		app.internalServerError(w, r, err)
 		return
 	}
-	if err := writeJson(w, http.StatusOK, postWithComments); err != nil {
+	if err := app.jsonResponse(w, http.StatusOK, postWithComments); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}

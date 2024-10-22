@@ -46,7 +46,10 @@ func (app *application) mount() http.Handler {
 		r.Route("/posts", func(r chi.Router) {
 			r.Post("/create", app.createNewPostHandler)
 			r.Route("/{postId}", func(r chi.Router) {
+				r.Use(app.postContextMiddleware)
 				r.Get("/", app.getPostHandler)
+				r.Delete("/", app.deletePostHandler)
+				r.Patch("/", app.updatePostHandler)
 			})
 		})
 
