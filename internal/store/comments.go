@@ -19,6 +19,10 @@ type CommentsStore struct {
 
 func (s *CommentsStore) Create(ctx context.Context, comment *Comment) error {
 	query := `INSERT INTO comments (post_id,user_id, content) VALUES ($1,$2,$3) RETURNING id,created_at`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	err := s.db.QueryRowContext(
 		ctx, query, comment.PostID, comment.UserID, comment.Content,
 	).Scan(
@@ -52,6 +56,10 @@ func (s *CommentsStore) GetPostByID(ctx context.Context, postId int64) ([]PostWi
 	INNER JOIN users as u 
 	ON u.id=c.user_id 
 	WHERE c.post_id=($1)`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	rows, err := s.db.QueryContext(ctx, query, postId)
 
 	if err != nil {

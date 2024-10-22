@@ -119,7 +119,12 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		post.Title = *postUpdatePaylaod.Title
 	}
 	if err := app.store.Posts.Update(ctx, post); err != nil {
-		app.internalServerError(w, r, err)
+		switch {
+		case errors.Is(err, store.ErrNotFound):
+			app.badRequestError(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
 		return
 	}
 	if err := app.jsonResponse(w, http.StatusOK, post); err != nil {
