@@ -21,17 +21,23 @@ type Storage struct {
 	}
 	Users interface {
 		Create(context.Context, *User) error
+		GetByID(context.Context, int64) (*User, error)
 	}
 	Comments interface {
 		Create(context.Context, *Comment) error
 		GetPostByID(context.Context, int64) ([]PostWithComments, error)
 	}
+	Followers interface {
+		Follow(context.Context, int64, int64) error
+		UnFollow(context.Context, int64, int64) error
+	}
 }
 
 func NewPostgresStorage(db *sql.DB) Storage {
 	return Storage{
-		Posts:    &PostStore{db: db},
-		Users:    &UserStore{db: db},
-		Comments: &CommentsStore{db: db},
+		Posts:     &PostStore{db: db},
+		Users:     &UserStore{db: db},
+		Comments:  &CommentStore{db: db},
+		Followers: &FollowerStore{db: db},
 	}
 }

@@ -39,5 +39,9 @@ func (app *application) jsonResponse(w http.ResponseWriter, status int, data any
 	type envelop struct {
 		Data any `json:"data"`
 	}
-	return writeJson(w, status, &envelop{data})
+	if data != nil {
+		return writeJson(w, status, &envelop{data})
+	} else {
+		return writeJson(w, status, nil)
+	}
 }

@@ -13,11 +13,11 @@ type Comment struct {
 	CreatedAt string `json:"created_at"`
 }
 
-type CommentsStore struct {
+type CommentStore struct {
 	db *sql.DB
 }
 
-func (s *CommentsStore) Create(ctx context.Context, comment *Comment) error {
+func (s *CommentStore) Create(ctx context.Context, comment *Comment) error {
 	query := `INSERT INTO comments (post_id,user_id, content) VALUES ($1,$2,$3) RETURNING id,created_at`
 
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -44,7 +44,7 @@ type PostWithComments struct {
 	CommentCreatedAt string `json:"comment_created_at"`
 }
 
-func (s *CommentsStore) GetPostByID(ctx context.Context, postId int64) ([]PostWithComments, error) {
+func (s *CommentStore) GetPostByID(ctx context.Context, postId int64) ([]PostWithComments, error) {
 	query := `SELECT
 		c.user_id as user_id,
 		c.post_id as post_id,
