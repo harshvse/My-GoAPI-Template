@@ -19,6 +19,8 @@ type Post struct {
 	UpdatedAt string   `json:"updated_at"`
 }
 
+type PostMetaData
+
 type PostStore struct {
 	db *sql.DB
 }
@@ -120,4 +122,7 @@ func (s *PostStore) Update(ctx context.Context, post *Post) error {
 	}
 
 	return nil
+}
+func (s *PostStore) GetUserFeed(ctx context.Context, userId int64) ([]*Post, error) {
+
 }
