@@ -19,7 +19,8 @@ type Post struct {
 	UpdatedAt string   `json:"updated_at"`
 }
 
-type PostMetaData
+type PostMetaData struct {
+}
 
 type PostStore struct {
 	db *sql.DB
