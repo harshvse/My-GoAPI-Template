@@ -1,13 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/harshvse/go-api/docs"
 	"github.com/harshvse/go-api/internal/store"
+	httpSwagger "github.com/swaggo/http-swagger/v2"
 )
 
 type application struct {
@@ -43,6 +46,8 @@ func (app *application) mount() http.Handler {
 	r.Route("/v1", func(r chi.Router) {
 		r.Get("/health", app.healthCheckHandler)
 
+		docsURL := fmt.Sprintf("%s/v1/swagger/docs.json", app.config.addr)
+		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
 		//posts
 		r.Route("/posts", func(r chi.Router) {
 			r.Post("/create", app.createNewPostHandler)
@@ -81,6 +86,9 @@ func (app *application) mount() http.Handler {
 // the run function takes a mux which is responsible for routing and deploys the code
 func (app *application) run(mux http.Handler) error {
 
+	docs.SwaggerInfo.Version = app.config.version
+	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.BasePath = "/v1"
 	srv := &http.Server{
 		Addr:         app.config.addr,
 		Handler:      mux,

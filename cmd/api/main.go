@@ -9,6 +9,20 @@ import (
 	"github.com/joho/godotenv"
 )
 
+//	@title			GoLang WebAPI Template With Chi-Postgres
+//	@version		1.0
+//	@description	This is a sample server for a social media.
+//	@termsOfService	/
+
+//	@contact.name	Harsh Verma
+//	@contact.url	http://harshvse.in
+//	@contact.email	harshvse@gmail.com
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host		localhost:8080
+// @BasePath	/v1
 func main() {
 	// load the .env file into environment variables so env.go can read them
 	err := godotenv.Load()
