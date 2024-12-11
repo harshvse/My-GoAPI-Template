@@ -64,12 +64,12 @@ func (app *application) mount() http.Handler {
 		r.Route("/users", func(r chi.Router) {
 			r.Route("/{userId}", func(r chi.Router) {
 				r.Use(app.userContextMiddleware)
-				r.Get("/", app.getUserByID)
-				r.Put("/follow", app.followUser)
-				r.Put("/unfollow", app.unFollowUser)
+				r.Get("/", app.getUserByIDHandler)
+				r.Put("/follow", app.followUserHandler)
+				r.Put("/unfollow", app.unFollowUserHandler)
 			})
 			r.Group(func(r chi.Router) {
-				r.Get("/feed", app.getUserFeed)
+				r.Get("/feed", app.getUserFeedHandler)
 			})
 		})
 

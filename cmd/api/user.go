@@ -14,7 +14,7 @@ type userKey string
 
 const userctx userKey = "user"
 
-func (app *application) getUserByID(w http.ResponseWriter, r *http.Request) {
+func (app *application) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromCtx(r)
 	if err := app.jsonResponse(w, http.StatusOK, user); err != nil {
 		app.internalServerError(w, r, err)
@@ -26,7 +26,7 @@ type FollowUser struct {
 	UserID int64 `json:"user_id"`
 }
 
-func (app *application) followUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request) {
 	followedUser := getUserFromCtx(r)
 
 	var payload FollowUser
@@ -46,7 +46,7 @@ func (app *application) followUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (app *application) unFollowUser(w http.ResponseWriter, r *http.Request) {
+func (app *application) unFollowUserHandler(w http.ResponseWriter, r *http.Request) {
 	unFollowedUser := getUserFromCtx(r)
 
 	var payload FollowUser

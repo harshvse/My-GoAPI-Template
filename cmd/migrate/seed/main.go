@@ -9,7 +9,7 @@ import (
 
 func main() {
 
-	addr := "postgres://postgres:postgres@localhost:5432/golangdb?sslmode=disable"
+	addr := "postgres://user:password@localhost:5432/golangdb?sslmode=disable"
 	maxOpenConns := 20
 	maxIdleConns := 20
 	maxIdleTime := "15m"
