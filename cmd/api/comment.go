@@ -41,7 +41,6 @@ func (app *application) createCommentHandler(w http.ResponseWriter, r *http.Requ
 func (app *application) getCommentByPostIDHandler(w http.ResponseWriter, r *http.Request) {
 	postIdString := chi.URLParam(r, "postId")
 	postId, err := strconv.ParseInt(postIdString, 10, 64)
-
 	if err != nil {
 		app.badRequestError(w, r, err)
 		return

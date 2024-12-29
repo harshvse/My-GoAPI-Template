@@ -1,4 +1,6 @@
 .direnv/
 result
 .go/
-.vscode
+bin
+tmp
+.env

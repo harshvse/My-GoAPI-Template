@@ -14,6 +14,20 @@ type userKey string
 
 const userctx userKey = "user"
 
+// GetUser godoc
+//
+//	@Summary		Fetch a user profile
+//	@Description	Fetch a user profile by ID
+//	@Tags			user
+//	@Accept			json
+//	@Produce		json
+//	@Param			id	path		int	true	"User ID"
+//	@Success		200	{object}	store.User
+//	@Failure		400	{object}	error
+//	@Failure		404	{object}	error
+//	@Failure		500	{object}	error
+//	@Security		ApiKeyAuth
+//	@Router			/users/{id} [get]
 func (app *application) getUserByIDHandler(w http.ResponseWriter, r *http.Request) {
 	user := getUserFromCtx(r)
 	if err := app.jsonResponse(w, http.StatusOK, user); err != nil {
@@ -67,7 +81,6 @@ func (app *application) unFollowUserHandler(w http.ResponseWriter, r *http.Reque
 }
 
 func (app *application) userContextMiddleware(next http.Handler) http.Handler {
-
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		userIdString := chi.URLParam(r, "userId")
 		userId, err := strconv.ParseInt(userIdString, 10, 64)

@@ -131,11 +131,11 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 		app.internalServerError(w, r, err)
 	}
 }
+
 func (app *application) postContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		postIdString := chi.URLParam(r, "postId")
 		postId, err := strconv.ParseInt(postIdString, 10, 64)
-
 		if err != nil {
 			app.badRequestError(w, r, err)
 			return

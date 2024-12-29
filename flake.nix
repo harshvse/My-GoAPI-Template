@@ -21,14 +21,18 @@
             gopls
             go-tools
             
-            # Air for live reload
-            air
-            
             # Build tools
             gnumake
             
             # Database tools
-            migrate
+            postgresql
+            
+            # Shell tools
+            direnv
+
+            # Container tools
+            podman
+            podman-compose
             
             # Additional development tools
             golangci-lint
@@ -39,6 +43,8 @@
           ];
 
           shellHook = ''
+            echo "Current working directory: $PWD"
+
             # Set GOPATH to the current directory
             export GOPATH="$PWD/.go"
             export PATH="$GOPATH/bin:$PATH"
@@ -52,6 +58,9 @@
             
             # Install additional Go tools required for VSCode
             echo "Installing additional Go tools..."
+            go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+            go install github.com/air-verse/air@latest
+            go install github.com/swaggo/swag/cmd/swag@latest
             go install github.com/uudashr/gopkgs/v2/cmd/gopkgs@latest
             go install github.com/ramya-rao-a/go-outline@latest
             go install github.com/cweill/gotests/gotests@latest
@@ -65,7 +74,8 @@
             echo "- go ($(go version))"
             echo "- gopls ($(gopls version))"
             echo "- air ($(air -v))"
-            echo "- migrate ($(migrate -version))"
+            echo "- migrate ($(migrate -version || echo 'installing...'))"
+            echo "- podman ($(podman --version))"
             echo "- make ($(make -v | head -n1))"
             echo "- golangci-lint ($(golangci-lint --version))"
           '';

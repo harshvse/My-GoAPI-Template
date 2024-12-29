@@ -53,6 +53,7 @@ func (s *PostStore) Create(ctx context.Context, post *Post) error {
 	}
 	return nil
 }
+
 func (s *PostStore) GetByID(ctx context.Context, postId int64) (*Post, error) {
 	var post Post
 	query := `SELECT * FROM posts WHERE id = ($1)`
@@ -77,7 +78,6 @@ func (s *PostStore) GetByID(ctx context.Context, postId int64) (*Post, error) {
 		default:
 			return nil, err
 		}
-
 	}
 	return &post, nil
 }
@@ -115,7 +115,6 @@ func (s *PostStore) Update(ctx context.Context, post *Post) error {
 	defer cancel()
 
 	err := s.db.QueryRowContext(ctx, query, post.Title, post.Content, post.ID, post.Version).Scan(&post.Version)
-
 	if err != nil {
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
@@ -127,7 +126,8 @@ func (s *PostStore) Update(ctx context.Context, post *Post) error {
 
 	return nil
 }
-func (s *PostStore) GetUserFeed(ctx context.Context, userId int64) ([]PostWithMetaData, error) {
+
+func (s *PostStore) GetUserFeed(ctx context.Context, userId int64, paginatedFeedQuery PaginatedFeedQuery) ([]PostWithMetaData, error) {
 	query := `SELECT p.id, p.user_id,p.title,p.content, p.created_at, p.tags, u.username,
 	COUNT(c.id) AS comments_count
 	FROM posts AS p

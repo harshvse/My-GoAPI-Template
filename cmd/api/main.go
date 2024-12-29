@@ -21,8 +21,13 @@ import (
 //	@license.name	Apache 2.0
 //	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host		localhost:8080
-// @BasePath	/v1
+// @host						localhost:8080
+// @BasePath					/v1
+//
+// @securityDefinitions.apiKey	ApiKeyAuth
+// @in							header
+// @name						Authorization
+// @description
 func main() {
 	// load the .env file into environment variables so env.go can read them
 	err := godotenv.Load()
