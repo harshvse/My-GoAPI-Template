@@ -1,3 +1,4 @@
-/bin
-.env
+.direnv/
+result
+.go/
 .vscode
