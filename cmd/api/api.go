@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -11,11 +10,13 @@ import (
 	"github.com/harshvse/go-api/docs"
 	"github.com/harshvse/go-api/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
+	"go.uber.org/zap"
 )
 
 type application struct {
 	config config
 	store  store.Storage
+	logger *zap.SugaredLogger
 }
 
 type config struct {
@@ -48,6 +49,10 @@ func (app *application) mount() http.Handler {
 
 		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
 		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))
+
+		r.Route("/authentication", func(r chi.Router) {
+			r.Post("/user", app.registerUserHandler)
+		})
 		// posts
 		r.Route("/posts", func(r chi.Router) {
 			r.Post("/create", app.createNewPostHandler)
@@ -95,7 +100,7 @@ func (app *application) run(mux http.Handler) error {
 		IdleTimeout:  time.Minute * 2,
 	}
 
-	log.Printf("Server started on %s", app.config.addr)
+	app.logger.Infow("Server started", "addr", app.config.addr, "env", app.config.env)
 
 	return srv.ListenAndServe()
 }

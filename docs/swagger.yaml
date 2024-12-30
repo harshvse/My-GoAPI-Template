@@ -1,5 +1,18 @@
 basePath: /v1
 definitions:
+  main.RegisterUserPayload:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
   store.User:
     properties:
       created_at:
@@ -27,6 +40,36 @@ info:
   title: GoLang WebAPI Template With Chi-Postgres
   version: "1.0"
 paths:
+  /authentication/user:
+    post:
+      consumes:
+      - application/json
+      description: Register a user with username, email and password
+      parameters:
+      - description: User Credentials
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/main.RegisterUserPayload'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User Registered
+          schema:
+            $ref: '#/definitions/store.User'
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Register a new user
+      tags:
+      - authentication
   /users/{id}:
     get:
       consumes:

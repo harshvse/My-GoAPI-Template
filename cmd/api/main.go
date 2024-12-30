@@ -7,6 +7,7 @@ import (
 	"github.com/harshvse/go-api/internal/env"
 	"github.com/harshvse/go-api/internal/store"
 	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 //	@title			GoLang WebAPI Template With Chi-Postgres
@@ -48,12 +49,17 @@ func main() {
 		version: env.GetString("APIVERSION", "UNDEFINED"),
 	}
 
+	// Logger
+	logger := zap.Must(zap.NewProduction()).Sugar()
+	defer logger.Sync()
+
+	// Database
 	db, err := db.New(cfg.db.addr, cfg.db.maxOpenConns, cfg.db.maxIdleConns, cfg.db.maxIdleTime)
 	if err != nil {
-		log.Panic("Database connection failed ", err)
+		logger.Fatal("Database connection failed ", err)
 	}
 	defer db.Close()
-	log.Println("Database connected")
+	logger.Info("Database connected")
 
 	store := store.NewPostgresStorage(db)
 
@@ -61,11 +67,12 @@ func main() {
 	app := &application{
 		config: cfg,
 		store:  store,
+		logger: logger,
 	}
 
 	// load all the routes
 	mux := app.mount()
 
 	// run the server
-	log.Fatal(app.run(mux))
+	logger.Fatal(app.run(mux))
 }
