@@ -22,6 +22,7 @@ type application struct {
 type config struct {
 	addr    string
 	db      dbConfig
+	mail    mailConfig
 	env     string
 	version string
 }
@@ -31,6 +32,10 @@ type dbConfig struct {
 	maxOpenConns int
 	maxIdleConns int
 	maxIdleTime  string
+}
+
+type mailConfig struct {
+	exp time.Duration
 }
 
 // this is where all the middlewares and the routes will be handled
@@ -53,6 +58,7 @@ func (app *application) mount() http.Handler {
 		r.Route("/authentication", func(r chi.Router) {
 			r.Post("/user", app.registerUserHandler)
 		})
+
 		// posts
 		r.Route("/posts", func(r chi.Router) {
 			r.Post("/create", app.createNewPostHandler)
@@ -72,6 +78,7 @@ func (app *application) mount() http.Handler {
 
 		// users
 		r.Route("/users", func(r chi.Router) {
+			r.Put("/activate/{token}", app.activateUserHandler)
 			r.Route("/{userId}", func(r chi.Router) {
 				r.Use(app.userContextMiddleware)
 				r.Get("/", app.getUserByIDHandler)

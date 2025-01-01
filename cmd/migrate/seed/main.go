@@ -22,5 +22,5 @@ func main() {
 	log.Println("database connected")
 
 	store := store.NewPostgresStorage(conn)
-	db.Seed(store)
+	db.Seed(store, conn)
 }

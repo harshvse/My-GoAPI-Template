@@ -71,6 +71,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/activate/{token}": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Activate a user from the email invitation sent during register",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Activate a new user from email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Invitation Token",
+                        "name": "payload",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User account activated",
+                        "schema": {
+                            "type": "String"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/users/{id}": {
             "get": {
                 "security": [
@@ -131,13 +176,17 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 255
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 72,
+                    "minLength": 3
                 },
                 "username": {
-                    "type": "string"
+                    "type": "string",
+                    "maxLength": 100
                 }
             }
         },

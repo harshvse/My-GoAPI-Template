@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"math/rand"
 
@@ -10,17 +11,20 @@ import (
 	"github.com/harshvse/go-api/internal/store"
 )
 
-func Seed(store store.Storage) {
+func Seed(store store.Storage, db *sql.DB) {
 	ctx := context.Background()
 
 	// Let's create users first
 	users := GenerateUsers(100)
+	tx, _ := db.BeginTx(ctx, nil)
 	for _, user := range users {
-		if err := store.Users.Create(ctx, user); err != nil {
+		if err := store.Users.Create(ctx, tx, user); err != nil {
+			_ = tx.Rollback()
 			log.Println("Error creating user: ", err)
 			return
 		}
 	}
+	tx.Commit()
 
 	posts := GeneratePosts(users, 100)
 	for _, post := range posts {
@@ -47,7 +51,6 @@ func GenerateUsers(n int) []*store.User {
 		users[i] = &store.User{
 			Username: fake.Person().Name(),
 			Email:    fake.Internet().Email(),
-			Password: fake.Internet().Password(),
 		}
 	}
 	return users

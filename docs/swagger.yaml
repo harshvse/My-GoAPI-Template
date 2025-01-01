@@ -3,10 +3,14 @@ definitions:
   main.RegisterUserPayload:
     properties:
       email:
+        maxLength: 255
         type: string
       password:
+        maxLength: 72
+        minLength: 3
         type: string
       username:
+        maxLength: 100
         type: string
     required:
     - email
@@ -100,6 +104,35 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Fetch a user profile
+      tags:
+      - user
+  /users/activate/{token}:
+    put:
+      consumes:
+      - application/json
+      description: Activate a user from the email invitation sent during register
+      parameters:
+      - description: Invitation Token
+        in: path
+        name: payload
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User account activated
+          schema:
+            type: String
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      security:
+      - ApiKeyAuth: []
+      summary: Activate a new user from email
       tags:
       - user
 securityDefinitions:
