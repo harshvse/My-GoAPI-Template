@@ -57,7 +57,7 @@ const docTemplate = `{
                     "201": {
                         "description": "User Registered",
                         "schema": {
-                            "$ref": "#/definitions/store.User"
+                            "$ref": "#/definitions/main.UserWithToken"
                         }
                     },
                     "400": {
@@ -93,13 +93,13 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Invitation Token",
-                        "name": "payload",
+                        "name": "token",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
-                    "204": {
+                    "200": {
                         "description": "User account activated",
                         "schema": {
                             "type": "String"
@@ -187,6 +187,32 @@ const docTemplate = `{
                 "username": {
                     "type": "string",
                     "maxLength": 100
+                }
+            }
+        },
+        "main.UserWithToken": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

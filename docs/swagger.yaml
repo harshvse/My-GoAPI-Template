@@ -17,6 +17,23 @@ definitions:
     - password
     - username
     type: object
+  main.UserWithToken:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      token:
+        type: string
+      updated_at:
+        type: string
+      username:
+        type: string
+    type: object
   store.User:
     properties:
       created_at:
@@ -64,7 +81,7 @@ paths:
         "201":
           description: User Registered
           schema:
-            $ref: '#/definitions/store.User'
+            $ref: '#/definitions/main.UserWithToken'
         "400":
           description: Bad Request
           schema: {}
@@ -116,13 +133,13 @@ paths:
       parameters:
       - description: Invitation Token
         in: path
-        name: payload
+        name: token
         required: true
         type: string
       produces:
       - application/json
       responses:
-        "204":
+        "200":
           description: User account activated
           schema:
             type: String

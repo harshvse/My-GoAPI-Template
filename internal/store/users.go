@@ -119,16 +119,19 @@ func (s *UserStore) ActivateUser(ctx context.Context, token string) error {
 		if err != nil {
 			return err
 		}
+
+		// Update user activation status
+		user.IsActive = true
+		if err := s.updateUserAcitvation(ctx, tx, user); err != nil {
+			return err
+		}
+
+		// Clean up invitations
+		if err := s.deleteUserInvitation(ctx, tx, user.ID); err != nil {
+			return err
+		}
 		return nil
 	})
-
-	// Update user activation status
-	user.IsActive = true
-	if err := s.updateUserAcitvation(ctx, tx, user); err != nil {
-		return err
-	}
-
-	// Clean up invitations
 }
 
 func (s *UserStore) createUserInvitation(ctx context.Context, tx *sql.Tx, token string, invitationExp time.Duration, userID int64) error {
@@ -148,7 +151,7 @@ func (s *UserStore) getUserByInvitationToken(ctx context.Context, tx *sql.Tx, to
 	query := `
 		SELECT u.id, u.email, u.username, u.created_at, u.is_active
 		FROM users u
-		JOIN users_invitation ui ON u.id = ui.user_id
+		JOIN user_invitation ui ON u.id = ui.user_id
 		WHERE ui.token = ($1) AND ui.expiry > ($2)
 	`
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
@@ -183,8 +186,23 @@ func (s *UserStore) updateUserAcitvation(ctx context.Context, tx *sql.Tx, user *
 	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
 	defer cancel()
 
-	_, err := tx.ExecContext(ctx, query, user.Username, user.Email, true, user.ID)
+	_, err := tx.ExecContext(ctx, query, user.Username, user.Email, user.IsActive, user.ID)
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (s *UserStore) deleteUserInvitation(ctx context.Context, tx *sql.Tx, userID int64) error {
+	query := `DELETE FROM user_invitation WHERE user_id = ($1)`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	_, err := tx.ExecContext(ctx, query, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
