@@ -5,9 +5,9 @@ MIGRATIONS_PATH = ./cmd/migrate/migrations
 run: up
 
 up:
-	podman-compose up -d db
+	docker compose up -d db
 	@echo "Waiting for PostgreSQL to be ready..."
-	@until podman-compose exec db pg_isready -h localhost -p 5432 -U user; do \
+	@until docker compose exec db pg_isready -h localhost -p 5432 -U user; do \
 		echo "PostgreSQL is unavailable - sleeping"; \
 		sleep 1; \
 	done

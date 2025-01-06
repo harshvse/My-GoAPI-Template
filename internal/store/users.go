@@ -18,7 +18,7 @@ type User struct {
 	Password  password `json:"-"`
 	CreatedAt string   `json:"created_at"`
 	UpdatedAt string   `json:"updated_at"`
-	IsActive bool      `json:"is_active"`
+	IsActive  bool     `json:"is_active"`
 }
 type password struct {
 	text *string
@@ -115,7 +115,7 @@ func (s *UserStore) CreateAndInviteUser(ctx context.Context, user *User, token s
 func (s *UserStore) ActivateUser(ctx context.Context, token string) error {
 	// Find ther user token
 	return withTX(s.db, ctx, func(tx *sql.Tx) error {
-		user, err := getUserByInvitationToken(ctx, tx, token)
+		user, err := s.getUserByInvitationToken(ctx, tx, token)
 		if err != nil {
 			return err
 		}
@@ -123,6 +123,10 @@ func (s *UserStore) ActivateUser(ctx context.Context, token string) error {
 	})
 
 	// Update user activation status
+	user.IsActive = true
+	if err := s.updateUserAcitvation(ctx, tx, user); err != nil {
+		return err
+	}
 
 	// Clean up invitations
 }
@@ -140,7 +144,7 @@ func (s *UserStore) createUserInvitation(ctx context.Context, tx *sql.Tx, token 
 	return nil
 }
 
-func (s *UserStore) getUserByInvitationToken(ctx context.Context, tx *sql.Tx, token string, expiry time.Time) (User, error) {
+func (s *UserStore) getUserByInvitationToken(ctx context.Context, tx *sql.Tx, token string) (*User, error) {
 	query := `
 		SELECT u.id, u.email, u.username, u.created_at, u.is_active
 		FROM users u
@@ -155,11 +159,32 @@ func (s *UserStore) getUserByInvitationToken(ctx context.Context, tx *sql.Tx, to
 	hash := sha256.Sum256([]byte(token))
 	hashToken := hex.EncodeToString(hash[:])
 
-	err := tx.QueryRowContext(ctx, query, hashToken, expiry).Scan(
+	err := tx.QueryRowContext(ctx, query, hashToken, time.Now()).Scan(
 		&user.ID,
 		&user.Email,
 		&user.Username,
 		&user.CreatedAt,
-		&user.isActive,
+		&user.IsActive,
 	)
+	if err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			return nil, ErrNotFound
+		default:
+			return nil, err
+		}
+	}
+	return user, nil
+}
+
+func (s *UserStore) updateUserAcitvation(ctx context.Context, tx *sql.Tx, user *User) error {
+	query := `UPDATE users SET username = ($1), email = ($2), is_active = ($3) WHERE id = ($4)`
+
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
+	_, err := tx.ExecContext(ctx, query, user.Username, user.Email, true, user.ID)
+	if err != nil {
+		return err
+	}
 }

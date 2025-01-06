@@ -202,6 +202,9 @@ const docTemplate = `{
                 "id": {
                     "type": "integer"
                 },
+                "is_active": {
+                    "type": "boolean"
+                },
                 "updated_at": {
                     "type": "string"
                 },
