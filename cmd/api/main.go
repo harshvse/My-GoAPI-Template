@@ -6,6 +6,7 @@ import (
 
 	"github.com/harshvse/go-api/internal/db"
 	"github.com/harshvse/go-api/internal/env"
+	"github.com/harshvse/go-api/internal/mailer"
 	"github.com/harshvse/go-api/internal/store"
 	"github.com/joho/godotenv"
 	"go.uber.org/zap"
@@ -47,10 +48,15 @@ func main() {
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
 		mail: mailConfig{
-			exp: time.Hour * 24 * 3, // 3 days
+			exp:       time.Hour * 24 * 3, // 3 days
+			fromEmail: env.GetString("SENDGRID_EMAIL", "hello@demomailtrap.com"),
+			mailTrap: mailTrap{
+				apikey: env.GetString("MAILTRAP_API_KEY", ""),
+			},
 		},
-		env:     env.GetString("ENVIRONMENT", "DEVELOPMENT"),
-		version: env.GetString("APIVERSION", "UNDEFINED"),
+		env:         env.GetString("ENVIRONMENT", "DEVELOPMENT"),
+		version:     env.GetString("APIVERSION", "UNDEFINED"),
+		frontendURL: env.GetString("Frontend_URL", "http://localhost:3000"),
 	}
 
 	// Logger
@@ -67,11 +73,19 @@ func main() {
 
 	store := store.NewPostgresStorage(db)
 
+	// Mailer
+	mailer, err := mailer.NewMailTrapClient(cfg.mail.mailTrap.apikey, cfg.mail.fromEmail)
+	if err != nil {
+		logger.Errorw("mailer creation failed", err)
+		return
+	}
+
 	// inject dependencies into the server
 	app := &application{
 		config: cfg,
 		store:  store,
 		logger: logger,
+		mailer: mailer,
 	}
 
 	// load all the routes

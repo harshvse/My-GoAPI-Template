@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/harshvse/go-api/docs"
+	"github.com/harshvse/go-api/internal/mailer"
 	"github.com/harshvse/go-api/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 	"go.uber.org/zap"
@@ -17,14 +18,16 @@ type application struct {
 	config config
 	store  store.Storage
 	logger *zap.SugaredLogger
+	mailer mailer.Client
 }
 
 type config struct {
-	addr    string
-	db      dbConfig
-	mail    mailConfig
-	env     string
-	version string
+	addr        string
+	db          dbConfig
+	mail        mailConfig
+	env         string
+	version     string
+	frontendURL string
 }
 
 type dbConfig struct {
@@ -35,7 +38,13 @@ type dbConfig struct {
 }
 
 type mailConfig struct {
-	exp time.Duration
+	exp       time.Duration
+	fromEmail string
+	mailTrap  mailTrap
+}
+
+type mailTrap struct {
+	apikey string
 }
 
 // this is where all the middlewares and the routes will be handled

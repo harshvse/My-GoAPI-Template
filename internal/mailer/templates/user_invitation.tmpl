@@ -1,0 +1,23 @@
+{{define "subject"}}Finish registering with this Go API Template{{end}}
+
+{{define "body"}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   <p>Hi {{.Username}},</p> 
+   <p>Thank you for signup on my GO API Tempalte, I am excited that you are using this template for your project</p>
+   <p>This email template exists in internal/mailer/templates make sure to update it accordingly</p>
+   <p>To confirm your email click on following link or copy paste in your browser</p>
+   <p><a href="{{.ActivationUrl}}">{{.ActivationUrl}}</a></p>
+   <p>Thanks,</p>
+   <p>Harsh Verma</p>
+</body>
+</html>
+
+{{end}}
