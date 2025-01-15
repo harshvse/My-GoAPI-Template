@@ -38,9 +38,10 @@ type dbConfig struct {
 }
 
 type mailConfig struct {
-	exp       time.Duration
-	fromEmail string
-	mailTrap  mailTrap
+	exp        time.Duration
+	fromEmail  string
+	mailTrap   mailTrap
+	maxRetries int
 }
 
 type mailTrap struct {

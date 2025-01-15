@@ -96,17 +96,23 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Send activate email
-	_, err = app.mailer.Send(mailer.UserWelcomeTemplate, user.Username, user.Email, vars, !isProdEnv)
-	if err != nil {
-		app.logger.Errorw("error sending the activation url", err)
-		// roll back user creation if email fails
-		if err := app.store.Users.Delete(ctx, user.ID); err != nil {
-			app.logger.Errorw("failed to delte the user", err)
+	for i := 0; i < app.config.mail.maxRetries; i++ {
+		_, err = app.mailer.Send(mailer.UserWelcomeTemplate, user.Username, user.Email, vars, !isProdEnv)
+		if err != nil {
+			app.logger.Errorw("error sending the activation url", err)
+			if i >= app.config.mail.maxRetries-1 {
+				app.logger.Info("max retries for email send reached for user %v. Aborting user creation.", user.Username)
+				// roll back user creation if email fails
+				if err := app.store.Users.Delete(ctx, user.ID); err != nil {
+					app.logger.Errorw("failed to delte the user", err)
+					return
+				}
+			}
+			app.internalServerError(w, r, err)
+			continue
 		}
-		app.internalServerError(w, r, err)
-		return
+		break
 	}
-
 	if err := app.jsonResponse(w, http.StatusCreated, userWithToken); err != nil {
 		app.internalServerError(w, r, err)
 	}

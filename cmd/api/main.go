@@ -48,10 +48,11 @@ func main() {
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
 		},
 		mail: mailConfig{
-			exp:       time.Hour * 24 * 3, // 3 days
-			fromEmail: env.GetString("SENDGRID_EMAIL", "hello@demomailtrap.com"),
+			exp:        time.Hour * 24 * 3, // 3 days
+			fromEmail:  env.GetString("SENDGRID_EMAIL", "hello@demomailtrap.com"),
+			maxRetries: 5,
 			mailTrap: mailTrap{
-				apikey: env.GetString("MAILTRAP_API_KEY", ""),
+				apikey: env.GetString("MAILTRAP_API_KEY", "bad-key"),
 			},
 		},
 		env:         env.GetString("ENVIRONMENT", "DEVELOPMENT"),

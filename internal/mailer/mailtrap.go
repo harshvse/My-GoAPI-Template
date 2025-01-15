@@ -29,17 +29,17 @@ func (m mailTrapClient) Send(templateFile, username, email string, data any, isS
 	// template parsing and building
 	tmpl, err := template.ParseFS(FS, "templates/"+templateFile)
 	if err != nil {
-		return -1, err
+		return 500, err
 	}
 
 	subject := new(bytes.Buffer)
 	if err := tmpl.ExecuteTemplate(subject, "subject", data); err != nil {
-		return -1, err
+		return 500, err
 	}
 
 	body := new(bytes.Buffer)
 	if err := tmpl.ExecuteTemplate(body, "body", data); err != nil {
-		return -1, err
+		return 500, err
 	}
 
 	message := gomail.NewMessage()
@@ -50,10 +50,9 @@ func (m mailTrapClient) Send(templateFile, username, email string, data any, isS
 
 	dialer := gomail.NewDialer("live.smtp.mailtrap.io", 587, "api", m.apiKey)
 
-	// TODO apply retries and error handling
 	if err := dialer.DialAndSend(message); err != nil {
 		log.Printf("failed to send email: %s", err.Error())
-		return -1, err
+		return 500, err
 	}
 
 	return 200, nil
