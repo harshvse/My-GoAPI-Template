@@ -53,7 +53,7 @@ func (m mailTrapClient) Send(templateFile, username, email string, data any, isS
 	// TODO apply retries and error handling
 	if err := dialer.DialAndSend(message); err != nil {
 		log.Printf("failed to send email: %s", err.Error())
-		return -1, nil
+		return -1, err
 	}
 
 	return 200, nil

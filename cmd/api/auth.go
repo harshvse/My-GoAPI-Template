@@ -96,7 +96,6 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	}
 
 	// Send activate email
-	// TODO I DON'T THINK THE ROLLBACK IS WORKING HERE
 	_, err = app.mailer.Send(mailer.UserWelcomeTemplate, user.Username, user.Email, vars, !isProdEnv)
 	if err != nil {
 		app.logger.Errorw("error sending the activation url", err)
