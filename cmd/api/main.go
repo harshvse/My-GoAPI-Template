@@ -41,6 +41,12 @@ func main() {
 	// set the configuration of the server
 	cfg := config{
 		addr: env.GetString("SERVER_URL", ":8080"),
+		auth: authConfig{
+			basicConfig{
+				username: env.GetString("AUTH_BASIC_USER", "admin"),
+				password: env.GetString("AUTH_BASIC_PASSWORD", "admin"),
+			},
+		},
 		db: dbConfig{
 			addr:         env.GetString("DB_URL", "postgres://user:password@localhost:5432/golangdb?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),

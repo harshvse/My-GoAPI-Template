@@ -36,3 +36,9 @@ seed:
 .PHONY: gen-docs
 gen-docs:
 	@swag init -g ./api/main.go -d cmd,internal && swag fmt
+
+.PHONY: install-deps
+install-deps:
+	@go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest \
+	&& go install github.com/air-verse/air@latest \
+	&& go install github.com/swaggo/swag/cmd/swag@latest

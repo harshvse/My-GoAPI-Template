@@ -23,6 +23,7 @@ type Storage struct {
 	Users interface {
 		Create(context.Context, *sql.Tx, *User) error
 		GetByID(context.Context, int64) (*User, error)
+		GetByEmail(context.Context, string) (*User, error)
 		CreateAndInviteUser(context.Context, *User, string, time.Duration) error
 		ActivateUser(context.Context, string) error
 		Delete(context.Context, int64) error

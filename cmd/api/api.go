@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/harshvse/go-api/docs"
+	"github.com/harshvse/go-api/internal/auth"
 	"github.com/harshvse/go-api/internal/mailer"
 	"github.com/harshvse/go-api/internal/store"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -15,19 +16,29 @@ import (
 )
 
 type application struct {
-	config config
-	store  store.Storage
-	logger *zap.SugaredLogger
-	mailer mailer.Client
+	config        config
+	store         store.Storage
+	logger        *zap.SugaredLogger
+	mailer        mailer.Client
+	authenticator auth.Authenticator
 }
 
 type config struct {
 	addr        string
+	auth        authConfig
 	db          dbConfig
 	mail        mailConfig
 	env         string
 	version     string
 	frontendURL string
+}
+
+type authConfig struct {
+	basic basicConfig
+}
+type basicConfig struct {
+	username string
+	password string
 }
 
 type dbConfig struct {
@@ -60,7 +71,8 @@ func (app *application) mount() http.Handler {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	r.Route("/v1", func(r chi.Router) {
-		r.Get("/health", app.healthCheckHandler)
+		r.With(app.BasicAuthMiddleware()).
+			Get("/health", app.healthCheckHandler)
 
 		docsURL := fmt.Sprintf("%s/swagger/doc.json", app.config.addr)
 		r.Get("/swagger/*", httpSwagger.Handler(httpSwagger.URL(docsURL)))

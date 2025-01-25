@@ -117,3 +117,55 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		app.internalServerError(w, r, err)
 	}
 }
+
+type CreateUserTokenPayload struct {
+	Email    string `json:"email" validate:"required,email,max=255"`
+	Password string `json:"password" validate:"required,min=3,max=72"`
+}
+
+// CreateTokenHandler godoc
+//
+//	@Summary		Creates a new token
+//	@Description	Create a new token for a user
+//	@Tags			authentication
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		CreateUserTokenPayload	true	"User Credentials"
+//	@Success		201		{string}	string					"Token"
+//	@Failure		400		{object}	error
+//	@Failure		401		{object}	error
+//	@Failure		500		{object}	error
+//	@Router			/authentication/token [post]
+func (app *application) createTokenHandler(w http.ResponseWriter, r *http.Request) {
+	// Parse payload credentials
+	var payload CreateUserTokenPayload
+
+	if err := readJson(w, r, &payload); err != nil {
+		app.badRequestError(w, r, err)
+		return
+	}
+
+	if err := Validate.Struct(payload); err != nil {
+		app.badRequestError(w, r, err)
+		return
+	}
+
+	// fetch the user if he exists from the credentials
+	user, err := app.store.Users.GetByEmail(r.Context(), payload.Email)
+	if err != nil {
+		switch err {
+		case store.ErrNotFound:
+			//TODO make this not found but don't return to frontend
+			app.unauthorizedError(w, r, err)
+		default:
+			app.internalServerError(w, r, err)
+		}
+		return
+	}
+	// generate the token -> add claims
+
+	// send it to the client
+	if err := app.jsonResponse(w, http.StatusCreated, nil); err != nil {
+		app.internalServerError(w, r, err)
+	}
+}
